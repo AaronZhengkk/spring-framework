@@ -26,6 +26,7 @@ import java.util.UUID;
  */
 public class JdkIdGenerator implements IdGenerator {
 
+	//#> 代理UUID.randomUUID
 	@Override
 	public UUID generateId() {
 		return UUID.randomUUID();

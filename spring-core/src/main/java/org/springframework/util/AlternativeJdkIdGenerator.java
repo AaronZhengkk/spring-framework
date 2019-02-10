@@ -35,11 +35,14 @@ public class AlternativeJdkIdGenerator implements IdGenerator {
 
 	private final Random random;
 
+	//#> 使用secureRandom生成的随机数作为seed, 生辰一个random, 使用这个random生成uuid
 
 	public AlternativeJdkIdGenerator() {
+		//#> 使用SecureRandom生成一个种子
 		SecureRandom secureRandom = new SecureRandom();
 		byte[] seed = new byte[8];
 		secureRandom.nextBytes(seed);
+		//#> 使用上面生成的种子, new一个Random.
 		this.random = new Random(new BigInteger(seed).longValue());
 	}
 
@@ -49,6 +52,7 @@ public class AlternativeJdkIdGenerator implements IdGenerator {
 		byte[] randomBytes = new byte[16];
 		this.random.nextBytes(randomBytes);
 
+		//#> 将生成的随机bytes数组转换成两个需要的64位long, 不过jdk1.8的版本有直接从bytes生成random的方法, 跟这段代码的逻辑一样
 		long mostSigBits = 0;
 		for (int i = 0; i < 8; i++) {
 			mostSigBits = (mostSigBits << 8) | (randomBytes[i] & 0xff);
@@ -59,6 +63,8 @@ public class AlternativeJdkIdGenerator implements IdGenerator {
 			leastSigBits = (leastSigBits << 8) | (randomBytes[i] & 0xff);
 		}
 
+		//#> 使用两个long, 生成一个uuid. 而不是使用默认的UUID layout, 和一些时间相关的东西, 不过生成uuid基本上都是使用randomUUID, 所以uuid的layout就不遵循默认的layout了
+		//#> 原来如此: 其实UUID就是两个long型的包装
 		return new UUID(mostSigBits, leastSigBits);
 	}
 

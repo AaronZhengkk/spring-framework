@@ -30,6 +30,10 @@ import java.util.ListIterator;
  * automatically populated as they are requested. This is particularly
  * useful for data binding to {@link List Lists}, allowing for elements
  * to be created and added to the {@link List} in a "just in time" fashion.
+ * #> just in time 风格创建和添加元素
+ * #> 用途: data binding to Lists.
+ * #> 功能: 获取指定下标的元素, 如果为空, 则按照定义的ElementFactory生成一个元素. 不指定则使用反射通过constructor生成元素.
+ * #>? 什么是data binding?
  *
  * <p>Note: This class is not thread-safe. To create a thread-safe version,
  * use the {@link java.util.Collections#synchronizedList} utility methods.
@@ -137,7 +141,10 @@ public class AutoPopulatingList<E> implements List<E>, Serializable {
 	public E get(int index) {
 		int backingListSize = this.backingList.size();
 		E element = null;
+
 		if (index < backingListSize) {
+			//#> index未超过数组长度
+			//#> 尝试获取指定下标的元素, 如果为空, 则创建元素, 然后添加至list, 然后返回
 			element = this.backingList.get(index);
 			if (element == null) {
 				element = this.elementFactory.createElement(index);
@@ -145,6 +152,8 @@ public class AutoPopulatingList<E> implements List<E>, Serializable {
 			}
 		}
 		else {
+			//#> index超过数组长度
+			//#> 添加空元素直至index, 创建元素, 添加至list, 然后返回
 			for (int x = backingListSize; x < index; x++) {
 				this.backingList.add(null);
 			}
@@ -293,6 +302,7 @@ public class AutoPopulatingList<E> implements List<E>, Serializable {
 		@Override
 		public E createElement(int index) {
 			try {
+				//#> 通过反射获取元素的constructor, 然后newInstance
 				return ReflectionUtils.accessibleConstructor(this.elementClass).newInstance();
 			}
 			catch (NoSuchMethodException ex) {

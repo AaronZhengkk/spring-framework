@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * A simple {@link IdGenerator} that starts at 1 and increments by 1 with each call.
+ * #> 功能: 开始于1, 然后每次增一
  *
  * @author Rossen Stoyanchev
  * @since 4.1.5
